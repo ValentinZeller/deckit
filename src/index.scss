@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+:root {
+  --bg-dark : rgb(45, 51, 56);
+  --bg-light : rgb(62, 66, 70);
+  --title-hover : rgb(35, 39, 43);
+  --post-hover : rgb(72, 80, 88);
+  --scrollbar-bg : rgb(51, 51, 51);
+  --scrollbar : rgb(100, 100, 100);
+  --btn : rgb(45, 50, 55);
+  --sort : rgb(40,42,45);
+}
+
+.subs::-webkit-scrollbar,
+.subreddit::-webkit-scrollbar,
+.post::-webkit-scrollbar,
+.sidebar-subreddit::-webkit-scrollbar {
+  width: 8px;
+}
+.subs::-webkit-scrollbar-thumb,
+.subreddit::-webkit-scrollbar-thumb,
+.post::-webkit-scrollbar-thumb,
+.sidebar-subreddit::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar);
+}
+.subs::-webkit-scrollbar-track,
+.subreddit::-webkit-scrollbar-track,
+.post::-webkit-scrollbar-track,
+.sidebar-subreddit::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-bg);
+}
