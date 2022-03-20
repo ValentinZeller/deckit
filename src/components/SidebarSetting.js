@@ -57,9 +57,9 @@ function SidebarSetting(props) {
                         <div className='mt-5'>
                             <Tags
                                 tagifyRef={tagifyRefDragSort}
-                                defaultValue={props.subreddits.map(subreddit => {
+                                defaultValue={props.subreddits ? props.subreddits.map(subreddit => {
                                     return subreddit.name
-                                })}
+                                }) : null}
                                 onChange={onChange}
                             />
                             <button className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => copyList()}>Copy the list</button>

@@ -18,14 +18,16 @@ function App() {
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    subreddits.forEach(subreddit => {
-      fetchAbout(subreddit.name);
-    })
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem("subreddits", JSON.stringify(subreddits));
   }, [subreddits]);
+
+  useEffect(() => {
+    if (subreddits !== null) {
+      subreddits.forEach(subreddit => {
+        fetchAbout(subreddit.name);
+      })
+    }
+  }, []);
 
   async function fetchAbout(url) {
     await fetch(`https://www.reddit.com/r/${url}/about.json`)
@@ -94,7 +96,7 @@ function App() {
   return (
     <div className="App h-screen flex bg-white dark:bg-gray-800 dark:text-white">
       <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} >
-        {subreddits.map((subreddit, index) => {
+        {subreddits ? subreddits.map((subreddit, index) => {
           let src = "";
           if (icons.length === subreddits.length) {
             src = icons.find(icon => icon.name === subreddit.name).src
@@ -104,11 +106,11 @@ function App() {
               <img src={src} alt={subreddit.name} className="w-12 hover:cursor-pointer"/>
             </li>
           )}
-        )}
+        ) : null}
         {isError && <div>Error fetching data.</div>}
       </Sidebar>
       <div className="subs flex gap-0 overflow-x-auto overflow-y-hidden" ref={mainRef}>
-        {subreddits.map(
+        {subreddits ? subreddits.map(
           (item, i) => ( 
             <Subreddit 
               key={i}
@@ -120,8 +122,8 @@ function App() {
               clickPost={showPost}
               hidden={item.hidden} />
             )
-          )}
-        {posts.map(
+          ) : null}
+        {posts ? posts.map(
           (item,i) => ( 
             <Post 
               key={i} 
@@ -133,7 +135,7 @@ function App() {
               comments={item.num_comments} 
               date={item.created_utc} /> 
               )
-            )}
+            ) : null}
       </div>
     </div>
 
