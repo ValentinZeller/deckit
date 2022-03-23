@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/deckit/static/css/main.aec487c4.css",
-    "main.js": "/deckit/static/js/main.5a677ff0.js",
+    "main.js": "/deckit/static/js/main.946a8dc5.js",
     "static/js/787.11a21cfe.chunk.js": "/deckit/static/js/787.11a21cfe.chunk.js",
     "index.html": "/deckit/index.html",
     "main.aec487c4.css.map": "/deckit/static/css/main.aec487c4.css.map",
-    "main.5a677ff0.js.map": "/deckit/static/js/main.5a677ff0.js.map",
+    "main.946a8dc5.js.map": "/deckit/static/js/main.946a8dc5.js.map",
     "787.11a21cfe.chunk.js.map": "/deckit/static/js/787.11a21cfe.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.aec487c4.css",
-    "static/js/main.5a677ff0.js"
+    "static/js/main.946a8dc5.js"
   ]
 }
