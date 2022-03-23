@@ -43,23 +43,25 @@ const Post = (props => {
                 <span className="post-title"><a target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-300" href={`https://www.reddit.com${props.permalink}`}>Link</a> : {props.title}</span>
             </div>
             <div className="post-content top-10">
-                <div className="post-body bg-slate-700 p-3" >
+                <div className={`post-body ${props.crosspost ? 'bg-slate-600' : 'bg-slate-700'} p-3`} >
                     <Content content={post}/>
                     {isError && <div>Error fetching data.</div>}
                 </div>
                 <PostDetail vote={props.vote} author={props.author} comments={props.comments} date={props.date} />                
-                <div className="post-sorting bg-slate-800 p-2">
-                    <span>Sort by : </span>
-                    <SortingButton name="Best" sortFunction={() => setSorting('confidence')}/>
-                    <SortingButton name="Top" sortFunction={() => setSorting('top')}/>
-                    <SortingButton name="New" sortFunction={() => setSorting('new')}/>
-                    <SortingButton name="Controversial" sortFunction={() => setSorting('controversial')}/>
-                    <SortingButton name="Old" sortFunction={() => setSorting('old')}/>
-                    <SortingButton name="Q&A" sortFunction={() => setSorting('qa')}/>
-                </div>
+                { !props.crosspost ?
+                    <div className="post-sorting bg-slate-800 p-2">
+                        <span>Sort by : </span>
+                        <SortingButton name="Best" sortFunction={() => setSorting('confidence')}/>
+                        <SortingButton name="Top" sortFunction={() => setSorting('top')}/>
+                        <SortingButton name="New" sortFunction={() => setSorting('new')}/>
+                        <SortingButton name="Controversial" sortFunction={() => setSorting('controversial')}/>
+                        <SortingButton name="Old" sortFunction={() => setSorting('old')}/>
+                        <SortingButton name="Q&A" sortFunction={() => setSorting('qa')}/>
+                    </div>
+                : null}
             </div>
             <div className="post-comments bg-slate-700 pt-2">
-                    {comments ? comments.map((comment, index) => (
+                    {(comments && !props.crosspost) ? comments.map((comment, index) => (
                         <Comment 
                             key={index} 
                             id = {comment.id}

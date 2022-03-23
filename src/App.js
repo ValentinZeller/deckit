@@ -5,16 +5,22 @@ import Post from './components/Post';
 import { useState, useEffect, createRef, useRef } from 'react';
 
 function App() {
+  const cache = JSON.parse(localStorage.getItem("subreddits"));
 
-  const [subreddits, setSubreddits] = useState(
-    JSON.parse(localStorage.getItem("subreddits"))
-  );
+  if (cache) {
+    cache.map(subreddit => {
+      return {
+        name: subreddit.name,
+        hidden: false
+      }
+    })
+  }
+  const [subreddits, setSubreddits] = useState(cache);
 
   const [posts, setPosts] = useState([]);
   const subsRef = useRef([]);
   const mainRef = useRef();
   let [icons, setIcons] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
@@ -34,7 +40,6 @@ function App() {
     .then(function(response){
         return response.json();
     }).then(function(data){
-      setIsLoading(false);
       let src = "";
       if (data.data.icon_img !== ''){
         src = data.data.icon_img;
@@ -45,7 +50,6 @@ function App() {
       }
       setIcons(icons => [...icons, {src: src, name: url}]);
     }).catch(error => {
-      setIsLoading(false);
       setIsError(true);
       console.log(error);
     });

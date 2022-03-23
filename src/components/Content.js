@@ -3,6 +3,7 @@ import remarkGfm from 'remark-gfm'
 import './Content.scss';
 import ReactPlayer from 'react-player'
 import ImageModal from './ImageModal';
+import Post from './Post';
 
 function Content(props) {
     let content;
@@ -17,7 +18,21 @@ function Content(props) {
             // Comment
             content = <ReactMarkdown children={data.body} remarkPlugins={[remarkGfm]} />;
         } else {
-            if (data.is_video || data.domain === "v.redd.it" || data.domain === "youtube.com" || data.domain === "youtu.be" || data.domain === "m.youtube.com") {
+            if (data.crosspost_parent_list) {
+                // Crosspost
+                //content = <Content content={data.crosspost_parent_list[0]} />;
+                let crosspost = data.crosspost_parent_list[0];
+                content = 
+                    <Post 
+                        permalink={crosspost.permalink} 
+                        vote={crosspost.ups} 
+                        author={crosspost.author}
+                        comments={crosspost.num_comments}
+                        date={crosspost.created_utc}
+                        title={crosspost.title}
+                        crosspost={true}
+                    />;
+            } else if (data.is_video || data.domain === "v.redd.it" || data.domain === "youtube.com" || data.domain === "youtu.be" || data.domain === "m.youtube.com") {
                 // Video
                 if (data.domain === "v.redd.it") {
                     // Reddit
