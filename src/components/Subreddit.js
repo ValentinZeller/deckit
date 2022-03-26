@@ -2,31 +2,27 @@ import './Subreddit.scss';
 import SortingButton from './SortingButton';
 import { useState, useEffect, useRef, forwardRef } from 'react'
 import PostHeader from './PostHeader';
-import { XIcon, ChevronDownIcon, ArrowSmLeftIcon } from '@heroicons/react/solid';
-import { Popover } from '@headlessui/react'
-import { usePopper } from 'react-popper'
+import { XIcon, ArrowSmLeftIcon } from '@heroicons/react/solid';
+import MyPopover from './MyPopover';
 
 const Subreddit = forwardRef((props, ref) => {
     let [posts, setPosts] = useState([]);
     let [sorting, setSorting] = useState('hot');
     let [after, setAfter] = useState();
     let [time, setTime] = useState('day');
+    let [flair, setFlair] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
-    let [referenceElement, setReferenceElement] = useState()
-    let [popperElement, setPopperElement] = useState()
-    let { styles, attributes } = usePopper(referenceElement, popperElement)
     let afterTemp = useRef();
 
     useEffect(() => {
         let isMounted = true;
-
-        const fetchSubreddit = async () => await fetch(`https://www.reddit.com/r/${props.name}/${sorting}.json?after=${after}&limit=25&t=${time}&raw_json=1`)
+        const fetchSubreddit = async () => await fetch(`https://www.reddit.com/r/${props.name}/${sorting}.json?after=${after}&limit=25&t=${time}&raw_json=1&f=flair_name:"${flair}"`)
         .then(response => response.json())
         .then(data => {
             if (isMounted) {
                 setIsLoading(false);
-                if (posts.length === 0) {
+                if (posts.length === 0 || after === undefined) {
                     setPosts(data.data.children.map(child => child.data));
                 } else {
                     let arrMerge = posts.concat(data.data.children.map(child => child.data));
@@ -42,15 +38,27 @@ const Subreddit = forwardRef((props, ref) => {
         fetchSubreddit();
 
         return () => isMounted = false;
-      }, [after, props.name, sorting, time]);
+      }, [after, props.name, sorting, time, flair]);
     
     if (isLoading) {
         return <div>Loading...</div>;
     }
 
+    function handleSorting(sorting) {
+        setSorting(sorting);
+        setAfter(undefined);
+        setPosts([]);
+    }
+
     function handleTopSorting(time) {
-        setSorting('top');
+        handleSorting('top');
         setTime(time);
+    }
+
+    function handleFlair(flair) {
+        setFlair(flair);
+        setAfter(undefined);
+        setPosts([]);
     }
 
     function handleScroll(e) {
@@ -64,25 +72,17 @@ const Subreddit = forwardRef((props, ref) => {
         <div id={props.name} tabIndex={props.tabIndex} ref={ref} onScroll={handleScroll} className={`subreddit h-screen overflow-y-scroll basis-1/4 flex-none ${props.hidden ? 'hidden' : null}`}>
             <div className="subreddit-header flex flex-row p-1 z-index-0 sticky top-0 bg-slate-900 items-center gap-1">
                 <span>{props.name}</span>
-                <SortingButton name="Hot" sortFunction={() => setSorting('hot')}/>
-                <SortingButton name="New" sortFunction={() => setSorting('new')}/>
-                <SortingButton name="Rising" sortFunction={() => setSorting('rising')}/>
-                <Popover>
-                    <Popover.Button id={props.name} className="bg-slate-700 p-1 border rounded-md border-black" ref={setReferenceElement}>Top <ChevronDownIcon className='w-4 inline' /></Popover.Button>
-                    <Popover.Panel
-                        className="popover-panel z-20 dark:bg-slate-800 flex flex-col"
-                        ref={setPopperElement}
-                        style={styles.popper}
-                        {...attributes.popper}
-                    >
-                        <SortingButton name="Now" sortFunction={() => handleTopSorting('hour')}/>
-                        <SortingButton name="Today" sortFunction={() => handleTopSorting('day')}/>
-                        <SortingButton name="This Week" sortFunction={() => handleTopSorting('week')}/>
-                        <SortingButton name="This Month" sortFunction={() => handleTopSorting('month')}/>
-                        <SortingButton name="This Year" sortFunction={() => handleTopSorting('year')}/>
-                        <SortingButton name="All Time" sortFunction={() => handleTopSorting('all')}/>
-                    </Popover.Panel> 
-                </Popover>
+                <SortingButton name="Hot" sortFunction={() => handleSorting('hot')}/>
+                <SortingButton name="New" sortFunction={() => handleSorting('new')}/>
+                <SortingButton name="Rising" sortFunction={() => handleSorting('rising')}/>
+                <MyPopover name={'Top'}>
+                    <SortingButton name="Now" sortFunction={() => handleTopSorting('hour')}/>
+                    <SortingButton name="Today" sortFunction={() => handleTopSorting('day')}/>
+                    <SortingButton name="This Week" sortFunction={() => handleTopSorting('week')}/>
+                    <SortingButton name="This Month" sortFunction={() => handleTopSorting('month')}/>
+                    <SortingButton name="This Year" sortFunction={() => handleTopSorting('year')}/>
+                    <SortingButton name="All Time" sortFunction={() => handleTopSorting('all')}/>
+                </MyPopover>
                 {props.hideFunction ? <button onClick={props.hideFunction} className="w-8 bg-red-500 justify-self-end"><ArrowSmLeftIcon /></button> : <></>}
                 {props.clickFunction ? <button onClick={props.clickFunction} className="w-8 bg-red-700 justify-self-end"><XIcon /></button> : <></>}
             </div>

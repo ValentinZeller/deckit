@@ -33,7 +33,7 @@ function SidebarSetting(props) {
 
     function onChange(e) {
         props.tagFunction(e.detail.tagify.value.map(tag => {
-            return {name: tag.value, hidden: false};
+            return tag.value
         }))
     }
 
@@ -44,7 +44,7 @@ function SidebarSetting(props) {
     return(
         <li>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed z-10 inset-0 overflow-y-auto">
-                <div className="flex items-center justify-center p-5">
+                <div className="items-center justify-center p-5">
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
                     <div className="relative bg-slate-700 text-white rounded max-w-5xl mx-auto p-4">
                         <Dialog.Title 
@@ -58,7 +58,7 @@ function SidebarSetting(props) {
                             <Tags
                                 tagifyRef={tagifyRefDragSort}
                                 defaultValue={props.subreddits ? props.subreddits.map(subreddit => {
-                                    return subreddit.name
+                                    return subreddit
                                 }) : null}
                                 onChange={onChange}
                             />

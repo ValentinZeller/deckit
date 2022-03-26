@@ -9,13 +9,11 @@ function App() {
 
   if (cache) {
     cache.map(subreddit => {
-      return {
-        name: subreddit.name,
-        hidden: false
-      }
+      return subreddit
     })
   }
   const [subreddits, setSubreddits] = useState(cache);
+  const [selectedSubreddit, setSelectedSubreddit] = useState();
 
   const [posts, setPosts] = useState([]);
   const subsRef = useRef([]);
@@ -25,15 +23,12 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("subreddits", JSON.stringify(subreddits));
-  }, [subreddits]);
-
-  useEffect(() => {
     if (subreddits !== null) {
       subreddits.forEach(subreddit => {
-        fetchAbout(subreddit.name);
+        fetchAbout(subreddit);
       })
     }
-  }, []);
+  }, [subreddits]);
 
   async function fetchAbout(url) {
     await fetch(`https://www.reddit.com/r/${url}/about.json`)
@@ -48,7 +43,8 @@ function App() {
       } else {
         src = "r/" + url[0].toUpperCase();
       }
-      setIcons(icons => [...icons, {src: src, name: url}]);
+      icons[url] = src;
+      setIcons({...icons});
     }).catch(error => {
       setIsError(true);
       console.log(error);
@@ -56,37 +52,36 @@ function App() {
   }  
 
   const add = (name) => {
-    if (!subreddits.includes(name)) {
-      setSubreddits([{name:name, hidden:false}, ...subreddits]);
+    if (subreddits === null) {
+      setSubreddits([name]);
+    } else if (!subreddits.includes(name)) {
+      setSubreddits([name, ...subreddits]);
     }
   }
 
   const remove = (name) => {
-    setSubreddits(subreddits.filter(subreddit => subreddit.name !== name));
+    setSubreddits(subreddits.filter(subreddit => subreddit !== name));
   }
 
   const showPost = (item, name) => {
     setPosts([item]);
-    setSubreddits(subreddits.map(subreddit => {
-      if (subreddit.name !== name) {
-        return {name:subreddit.name,hidden:true};
-      }
-      return subreddit;
-    }));
+    setSelectedSubreddit(name);
   }
 
   const hidePost = (name) => {
     setPosts([]);
-    setSubreddits(subreddits.map(subreddit => {
-      if (subreddit.name !== name) {
-        return {name:subreddit.name,hidden:false};
-      }
-      return subreddit;
-    }));
-
+    setSelectedSubreddit()
     setTimeout(() => {
       focusSubreddit(name);
     }, 100);
+  }
+
+  const isSelected = (name) => {
+    if (selectedSubreddit !== null && selectedSubreddit !== undefined) {
+      return selectedSubreddit !== name;
+    } else {
+      return false;
+    }
   }
 
   const focusSubreddit = (name) => {
@@ -100,14 +95,10 @@ function App() {
   return (
     <div className="App h-screen flex bg-white dark:bg-gray-800 dark:text-white">
       <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} >
-        {subreddits ? subreddits.map((subreddit, index) => {
-          let src = "";
-          if (icons.length === subreddits.length) {
-            src = icons.find(icon => icon.name === subreddit.name).src
-          }
+        {(subreddits && icons) ? subreddits.map((subreddit, index) => {
           return(
-            <li key={index} className='h-10' onClick={() => focusSubreddit(subreddit.name)}>
-              <img src={src} alt={subreddit.name} className="w-12 hover:cursor-pointer"/>
+            <li key={index} className='h-10' onClick={() => focusSubreddit(subreddit)}>
+              <img src={icons[subreddit]} alt={subreddit} className="w-12 hover:cursor-pointer"/>
             </li>
           )}
         ) : null}
@@ -120,11 +111,12 @@ function App() {
               key={i}
               ref={subsRef.current[i] ? subsRef.current[i] : subsRef.current[i] = createRef()}
               tabIndex={i}
-              name={item.name}
+              name={item}
               //clickFunction={!posts[0] ? () => remove(item.name) : null}
               hideFunction={posts[0] ? () => hidePost(item.name) : null}  
               clickPost={showPost}
-              hidden={item.hidden} />
+              hidden={isSelected(item)} 
+            />
             )
           ) : null}
         {posts ? posts.map(
@@ -137,7 +129,8 @@ function App() {
               vote={item.ups} 
               author={item.author} 
               comments={item.num_comments} 
-              date={item.created_utc} /> 
+              date={item.created_utc} 
+            /> 
               )
             ) : null}
       </div>
