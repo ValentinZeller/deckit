@@ -31,10 +31,14 @@ function SidebarSetting(props) {
         tagifyRefDragSort.current.updateValueByDOMTags()
     }
 
-    function onChange(e) {
+    function onTagChange(e) {
         props.tagFunction(e.detail.tagify.value.map(tag => {
             return tag.value
         }))
+    }
+
+    function onWidthChange(e) {
+        props.widthFunction(e.target.value);
     }
 
     function copyList() {
@@ -60,9 +64,14 @@ function SidebarSetting(props) {
                                 defaultValue={props.subreddits ? props.subreddits.map(subreddit => {
                                     return subreddit
                                 }) : null}
-                                onChange={onChange}
+                                onChange={onTagChange}
                             />
                             <button className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => copyList()}>Copy the list</button>
+                            <div className='widthField mt-2'>
+                                <label>Column Width :</label>
+                                <input type="range" className='ml-2 mr-2' min="0" max="100" onChange={(onWidthChange)} value={props.columnWidth}/>
+                                <output>{props.columnWidth}</output>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -51,7 +51,7 @@ function Content(props) {
                     } else {
                         link = data.media_metadata[keys[index].media_id].s.u.replace(/&amp;/g,'&');
                     }
-                    return <ImageModal key={index} url={link} title={data.title} gallery={true} />
+                    return <ImageModal key={index} caption={keys[index].caption} url={link} title={data.title} gallery={true} />
                 });
             } else if (data.post_hint === "image" || data.post_hint === "Image" || data.domain === "i.redd.it" || data.domain === "i.imgur.com") {
                 // Image
@@ -70,7 +70,7 @@ function Content(props) {
     }
 
     return(
-        <span>
+        <span className='inline-block'>
             { data ? content : null }
         </span>
     );

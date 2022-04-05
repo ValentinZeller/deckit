@@ -2,52 +2,48 @@ import './Comment.scss';
 import { useState, useEffect } from 'react'
 import PostDetail from "./PostDetail";
 import Content from "./Content";
+import { fetchComment } from "../API/fetch";
 
 function Comment(props) {
     let [nestedComments] = useState(props.nestedComments);
-
     let [replies, setReplies] = useState();
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
+
+    const randomColor = () => {
+        let letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
 
     useEffect(() => {
         let isMounted = true;
-        async function fetchComment() {
+        setReplies();
+        
+        async function updateComment() {
             if (props.permalink !== undefined) {
-                await fetch(`https://www.reddit.com/${props.permalink}.json?&raw_json=1`)
-                .then(response => response.json())
-                .then(data => {
-                    if (isMounted) {
-                        setIsLoading(false);
-                        if (data[1]) {
-                            if (data[1].data.children[0].data.replies) {
-                                setReplies(data[1].data.children[0].data.replies.data.children.map(child => child.data));
-                            }
-                        }
+                const data = await fetchComment(props.permalink);
+                if (data[1]) {
+                    if (data[1].data.children[0].data.replies) {
+                        setReplies(data[1].data.children[0].data.replies.data.children.map(child => child.data));
                     }
-                }).catch(error => {
-                    setIsLoading(false);
-                    setIsError(true);
-                    console.log(error);
-                });
+                }
             }
         }
-        fetchComment();
-
-        return () => isMounted = false;
+        if (isMounted) {
+            updateComment();
+        }
+        
+        return () => { isMounted = false }
     }, [props.permalink]);
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
     return(
-        <div className={`comment ${nestedComments ? 'nested' : 'notnested' }`}>
+        <div className={`comment ${nestedComments ? 'nested' : 'notnested' }`} style={{borderLeft: `1px solid ${randomColor()}`}}>
             <div className="comment-item mt-1 pb-1">
                 <PostDetail vote={props.ups} author={props.author} date={props.date} />
                 <div className="comment-item-body mt-2 pl-2">
                     <Content content={props.body}/>
-                    {isError && <div>Error fetching data.</div>}
                     {(replies) ? replies.map(
                         (child, index) => (
                             <Comment 

@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar.js';
 import Subreddit from './components/Subreddit';
 import Post from './components/Post';
 import { useState, useEffect, createRef, useRef } from 'react';
+import { fetchAbout } from './API/fetch.js';
 
 function App() {
   const cache = JSON.parse(localStorage.getItem("subreddits"));
@@ -14,42 +15,45 @@ function App() {
   }
   const [subreddits, setSubreddits] = useState(cache);
   const [selectedSubreddit, setSelectedSubreddit] = useState();
+  let [columnWidth, setColumnWidth] = useState(localStorage.getItem("columnWidth"));
 
   const [posts, setPosts] = useState([]);
   const subsRef = useRef([]);
   const mainRef = useRef();
   let [icons, setIcons] = useState([]);
-  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("subreddits", JSON.stringify(subreddits));
-    if (subreddits !== null) {
-      subreddits.forEach(subreddit => {
-        fetchAbout(subreddit);
-      })
-    }
-  }, [subreddits]);
-
-  async function fetchAbout(url) {
-    await fetch(`https://www.reddit.com/r/${url}/about.json`)
-    .then(function(response){
-        return response.json();
-    }).then(function(data){
+    let isMounted = true; 
+    async function updateIcon(url) {
+      const data = await fetchAbout(url);
       let src = "";
-      if (data.data.icon_img !== ''){
-        src = data.data.icon_img;
-      } else if (data.data.community_icon !== '') {
-        src = data.data.community_icon.split('?')[0];
+      if (data.icon_img !== ''){
+        src = data.icon_img;
+      } else if (data.community_icon !== '') {
+        src = data.community_icon.split('?')[0];
       } else {
-        src = "r/" + url[0].toUpperCase();
+        src = process.env.PUBLIC_URL + "/favicon.png";
       }
       icons[url] = src;
       setIcons({...icons});
-    }).catch(error => {
-      setIsError(true);
-      console.log(error);
-    });
-  }  
+    }
+    
+    localStorage.setItem("subreddits", JSON.stringify(subreddits));
+    if (isMounted) {
+      if (subreddits !== null) {
+        subreddits.forEach(subreddit => {
+          updateIcon(subreddit);
+        })
+      }
+    }
+
+    return () => { isMounted = false }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subreddits]);
+
+  useEffect(() => {
+    localStorage.setItem("columnWidth", columnWidth);
+  }, [columnWidth])
 
   const add = (name) => {
     if (subreddits === null) {
@@ -59,9 +63,11 @@ function App() {
     }
   }
 
+  /*
   const remove = (name) => {
     setSubreddits(subreddits.filter(subreddit => subreddit !== name));
   }
+  */
 
   const showPost = (item, name) => {
     setPosts([item]);
@@ -93,8 +99,8 @@ function App() {
   }
 
   return (
-    <div className="App h-screen flex bg-white dark:bg-gray-800 dark:text-white">
-      <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} >
+    <div className="App h-screen flex bg-white dark:bg-gray-800 dark:text-slate-300">
+      <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} columnWidth={columnWidth} widthFunction={setColumnWidth} >
         {(subreddits && icons) ? subreddits.map((subreddit, index) => {
           return(
             <li key={index} className='h-10' onClick={() => focusSubreddit(subreddit)}>
@@ -102,7 +108,6 @@ function App() {
             </li>
           )}
         ) : null}
-        {isError && <div>Error fetching data.</div>}
       </Sidebar>
       <div className="subs flex gap-0 overflow-x-auto overflow-y-hidden" ref={mainRef}>
         {subreddits ? subreddits.map(
@@ -112,10 +117,12 @@ function App() {
               ref={subsRef.current[i] ? subsRef.current[i] : subsRef.current[i] = createRef()}
               tabIndex={i}
               name={item}
-              //clickFunction={!posts[0] ? () => remove(item.name) : null}
-              hideFunction={posts[0] ? () => hidePost(item.name) : null}  
+              //clickFunction={!posts[0] ? () => remove(item) : null}
+              hideFunction={posts[0] ? () => hidePost(item) : null}  
               clickPost={showPost}
-              hidden={isSelected(item)} 
+              hidden={isSelected(item)}
+              columnWidth={columnWidth}
+              icon={icons[item]} 
             />
             )
           ) : null}

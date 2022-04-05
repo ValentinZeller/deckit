@@ -1,7 +1,6 @@
 function SortingButton(props) {
-
     return(
-        <button onClick={props.sortFunction} className="bg-slate-700 hover:bg-slate-500 p-1 border rounded-md border-black">{props.name}</button>
+        <button onClick={props.sortFunction} className="bg-slate-700 text-xs lg:text-sm hover:bg-slate-500 border lg:p-1 rounded-md border-black">{props.name}</button>
     );
 }
 

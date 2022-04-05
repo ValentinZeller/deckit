@@ -17,7 +17,7 @@ function Sidebar(props) {
                     <button className="border rounded-md border-black dark:bg-slate-700 hover:bg-slate-500 w-12" onClick={refreshPage}><RefreshIcon /></button>
                 </li>
                 <SidebarSearch name="add" icon={<SearchIcon />} clickFunction={props.clickFunction} />
-                <SidebarSetting name="setting" icon={<CogIcon />} tagFunction={props.tagFunction} subreddits={props.subreddits} />
+                <SidebarSetting name="setting" icon={<CogIcon />} tagFunction={props.tagFunction} subreddits={props.subreddits} columnWidth={props.columnWidth} widthFunction={props.widthFunction} />
                 <ul className="sidebar-subreddit overflow-y-auto overflow-x-hidden">
                     {props.children}
                 </ul>
