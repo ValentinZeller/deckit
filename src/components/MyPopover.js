@@ -10,7 +10,7 @@ function MyPopover(props) {
     let { styles, attributes } = usePopper(referenceElement, popperElement);
 
     return(
-    <Popover>
+    <Popover className={"inline-block"}>
         <Popover.Button id={props.name} className="bg-slate-700 text-xs lg:text-sm lg:p-1 border rounded-md border-black" ref={setReferenceElement}>{props.name} <ChevronDownIcon className='lg:w-4 inline' /></Popover.Button>
         <Popover.Panel
             className="popover-panel z-20 dark:bg-slate-800 flex flex-col"

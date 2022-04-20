@@ -9,7 +9,7 @@ function Content(props) {
     let content;
 
     let data = props.content;
-    
+
     if (data) {
         if (data.is_self) {
             // Text Post
@@ -59,10 +59,12 @@ function Content(props) {
                     data.url = data.url.slice(0, -1);
                 }
                 content = <ImageModal url={data.url} title={data.title} />;
-            } else if ( props.domain === "twitter.com" || props.domain === 'gfycat.com') {
+            } else if ( (data.domain === "twitter.com" || data.domain === 'gfycat.com' || data.domain === 'imgur.com') && data.media.oembed ) {
                 // Embeded content
-                content = <ReactMarkdown children={data.media.oembed.html} remarkPlugins={[remarkGfm]} />;
+               // content = <ReactMarkdown children={data.secure_media_embed.content} remarkPlugins={[remarkGfm]} />;
+                content = <div dangerouslySetInnerHTML={{__html: data.media.oembed.html}} />;
             } else {
+                
                 // Link Post
                 content = <a href={data.url}>{data.url}</a>;
             }

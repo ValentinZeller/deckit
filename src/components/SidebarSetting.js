@@ -46,7 +46,7 @@ function SidebarSetting(props) {
     }
 
     return(
-        <li>
+        <li className='h-12'>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed z-10 inset-0 overflow-y-auto">
                 <div className="items-center justify-center p-5">
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />

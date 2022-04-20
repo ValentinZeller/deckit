@@ -1,0 +1,20 @@
+.sorting-button {
+    background-color: rgb(51, 65, 85);
+    border: 1px solid black;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .sorting-button {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        padding: 0.25rem;
+    }
+}
+
+.disclosure {
+    padding-bottom: 0.15rem;
+    background-color: #233e62;
+}

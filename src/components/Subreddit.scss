@@ -1,0 +1,19 @@
+.subreddit-header {
+    
+    input[name="width"] {
+        color: black;
+    }
+    
+    .tablist {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .selected-tab {
+        color: rgb(203, 213, 225);
+        background-color: rgb(59, 130, 246);
+        padding: 1%;
+        border-radius: 10px;
+    }
+
+}

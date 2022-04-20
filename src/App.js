@@ -4,16 +4,18 @@ import Subreddit from './components/Subreddit';
 import Post from './components/Post';
 import { useState, useEffect, createRef, useRef } from 'react';
 import { fetchAbout } from './API/fetch.js';
+import './API/main.js'
 
 function App() {
-  const cache = JSON.parse(localStorage.getItem("subreddits"));
+  const cacheSubs = JSON.parse(localStorage.getItem("subreddits"));
 
-  if (cache) {
-    cache.map(subreddit => {
+  if (cacheSubs) {
+    cacheSubs.map(subreddit => {
       return subreddit
     })
   }
-  const [subreddits, setSubreddits] = useState(cache);
+
+  const [subreddits, setSubreddits] = useState(cacheSubs);
   const [selectedSubreddit, setSelectedSubreddit] = useState();
   let [columnWidth, setColumnWidth] = useState(localStorage.getItem("columnWidth"));
 
@@ -99,7 +101,7 @@ function App() {
   }
 
   return (
-    <div className="App h-screen flex bg-white dark:bg-gray-800 dark:text-slate-300">
+    <div className="App h-screen overflow-y-hidden flex bg-white dark:bg-gray-800 dark:text-slate-300">
       <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} columnWidth={columnWidth} widthFunction={setColumnWidth} >
         {(subreddits && icons) ? subreddits.map((subreddit, index) => {
           return(

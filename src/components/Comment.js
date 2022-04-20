@@ -19,7 +19,6 @@ function Comment(props) {
 
     useEffect(() => {
         let isMounted = true;
-        setReplies();
         
         async function updateComment() {
             if (props.permalink !== undefined) {
@@ -32,6 +31,7 @@ function Comment(props) {
             }
         }
         if (isMounted) {
+            setReplies();
             updateComment();
         }
         
