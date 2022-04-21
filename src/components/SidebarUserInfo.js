@@ -4,7 +4,7 @@ import '@yaireo/tagify/dist/tagify.css'
 import { XIcon, LogoutIcon } from '@heroicons/react/solid';
 import { r, aboutMe, logout } from '../API/main';
 import { displayDate } from '../utils/date'
-import Content from './Content'
+import InboxMessage from './InboxMessage';
 
 function SidebarUserInfo(props) {
     let [isOpen, setIsOpen] = useState(false)
@@ -53,31 +53,26 @@ function SidebarUserInfo(props) {
                                     {user.comment_karma} comment karma
                                 </div>
                                 <div className="text-sm">
-                                    Created : {displayDate(user.created_utc).day}/{displayDate(user.created_utc).month}/{displayDate(user.created_utc).year} - {displayDate(user.created_utc).hour}:{displayDate(user.created_utc).minute}:{displayDate(user.created_utc).second}
+                                    Created : {displayDate(user.created_utc,true)}
                                 </div>
                             </div>
                         </div>
                     : null }
                     { inbox ?
                         <div className="mt-2">
+                            <div className="text-2xl pl-2 bg-slate-800">
+                                Inbox
+                            </div>
                             {inbox.map((child,index) => {
                                 return(
-                                    <div key={index} className="items-center">
-                                        <div className="">
-                                            <div className="text-sm font-medium bg-slate-800 pl-3 pt-2">
-                                                {child.subject} {child.context !== "" ? <span className="text-sm"><a href={`https://www.reddit.com${child.context}`}>Link</a></span> : null}
-                                            </div>
-                                            <div className="text-sm bg-slate-800 pl-3">
-                                                {child.author.name}
-                                            </div>
-                                            <div className="text-sm bg-slate-800 pl-3">
-                                                {displayDate(child.created_utc).day}/{displayDate(child.created_utc).month}/{displayDate(child.created_utc).year} - {displayDate(child.created_utc).hour}:{displayDate(child.created_utc).minute}:{displayDate(child.created_utc).second}
-                                            </div>
-                                            <div className='pl-3 mt-2'>
-                                                <Content content={child}/>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <InboxMessage 
+                                        key={index} 
+                                        title={child.subject}
+                                        content={child}
+                                        date={child.created_utc}
+                                        author={child.author.name}
+                                        context={child.context}
+                                    />
                                 )
                             })}
                         </div>

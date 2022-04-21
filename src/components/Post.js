@@ -1,4 +1,4 @@
-import PostDetail from "./PostDetail";
+import PostDetail from "./Detail";
 import Comment from "./Comment";
 import Content from "./Content";
 import SortingButton from "./SortingButton";

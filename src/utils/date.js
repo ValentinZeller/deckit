@@ -1,4 +1,4 @@
-export function displayDate(utc) {
+export function displayDate(utc, isDisplayed) {
     let date = new Date(0);
     if (utc) {
         date.setUTCSeconds(utc);
@@ -13,5 +13,8 @@ export function displayDate(utc) {
     let minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
     let second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
     
+    if (isDisplayed) {
+        return day + "/" + month + "/" + year + " - " + hour + ":" + minute + ":" + second;
+    }
     return {day: day, month: month, year: year, hour: hour, minute: minute, second: second};
 }

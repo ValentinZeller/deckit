@@ -5,36 +5,62 @@ import PostHeader from './PostHeader';
 import { XIcon, ArrowSmLeftIcon, ChevronDownIcon, MenuIcon } from '@heroicons/react/solid';
 import MyPopover from './MyPopover';
 import { fetchSubreddit } from '../API/fetch';
-import { r, fetchSubredditAPI } from '../API/main';
-import { Disclosure, Tab } from '@headlessui/react'
+import { r, fetchSubredditAPI, fetchSubredditByFlair, fetchSubredditFlair } from '../API/main';
+import { Tab } from '@headlessui/react'
 
 const Subreddit = forwardRef((props, ref) => {
+    let lastIndex = 2;
+    if (r) {
+        lastIndex = 3;
+    }
     let cacheWidth = localStorage.getItem(`${props.name}_width`);
     if (!cacheWidth) {
         cacheWidth = props.columnWidth;
     }
     let [width,  setWidth] = useState(cacheWidth);
-    const [selectedIndex, setSelectedIndex] = useState(2)
+    const [selectedIndex, setSelectedIndex] = useState(lastIndex)
     
     let [posts, setPosts] = useState([]);
     let [sorting, setSorting] = useState('hot');
     let [after, setAfter] = useState();
     let [time, setTime] = useState('day');
+    let [flair, setFlair] = useState();
+    let [flairList, setFlairList] = useState([]);
     let afterTemp = useRef();
 
     useEffect(() => {
         let isMounted = true;
         async function updateSubreddit() {
             let data;
-            data = await fetchSubreddit(props.name, sorting, after, time);
-            if (posts.length === 0 || after === undefined) {
-                setPosts(data.children.map(child => child.data));
+            if (r && r.ratelimitRemaining > 0 && r.ratelimitRemaining !== null) {
+                if (flair !== undefined) {
+                    data = await fetchSubreddit(props.name, sorting, after, time);
+                } else {
+                    data = await fetchSubredditByFlair(props.name, sorting, after, time, flair);
+                }
+                afterTemp.current = data._query.after;
+                if (posts.length === 0 || after === undefined) {
+                    setPosts(data.toJSON());
+                } else {
+                    let arrMerge = [...posts, ...data.toJSON()];
+                    setPosts(arrMerge);
+                }
             } else {
-                let arrMerge = posts.concat(data.children.map(child => child.data));
-                setPosts(arrMerge);
+                data = await fetchSubreddit(props.name, sorting, after, time);
+                afterTemp.current = data.after;
+                if (posts.length === 0 || after === undefined) {
+                    setPosts(data.children.map(child => child.data));
+                } else {
+                    let arrMerge = posts.concat(data.children.map(child => child.data));
+                    setPosts(arrMerge);
+                }
             }
-            afterTemp.current = data.after;
             
+            if (flairList.length === 0) {
+                let tempFlair = await fetchSubredditFlair(props.name);
+                setFlairList(tempFlair);
+            }
+
         }
         if (isMounted) {
             updateSubreddit();
@@ -42,7 +68,7 @@ const Subreddit = forwardRef((props, ref) => {
 
         return () => { isMounted = false }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [after, props.name, sorting, time]);
+    }, [after, props.name, sorting, time, flair]);
 
     function handleSorting(sort) {
         if (sort !== sorting) {
@@ -80,7 +106,7 @@ const Subreddit = forwardRef((props, ref) => {
         if (selectedIndex !== e.index) {
             setSelectedIndex(e.index);
         } else {
-            setSelectedIndex(2);
+            setSelectedIndex(lastIndex);
         }
     }
 
@@ -99,6 +125,14 @@ const Subreddit = forwardRef((props, ref) => {
                                 </button>
                             )}
                             </Tab>
+                            { r ? 
+                            <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <button onClick={handleTab} className={selected ? 'selected-tab' : ''}>
+                                    {flair ? flair : "flair"}<ChevronDownIcon className={`lg:w-6 inline ${selected ? "transform rotate-180" : ""}`}/>
+                                </button>
+                            )}
+                            </Tab> : null }
                             <Tab as={Fragment}>
                             {({ selected }) => (
                                 <button onClick={handleTab} className={selected ? 'selected-tab' : ''}>
@@ -122,6 +156,15 @@ const Subreddit = forwardRef((props, ref) => {
                                     <SortingButton name="All Time" sortFunction={() => handleTopSorting('all')}/>
                                 </MyPopover>
                             </Tab.Panel>
+                            { r ?
+                            <Tab.Panel>
+                                <SortingButton name="None" sortFunction={() => setFlair(undefined)}/>
+                                { flairList.length > 0 && flairList.map(
+                                    (flairElm, index) => (
+                                        <SortingButton key={index} name={flairElm.flair_text} sortFunction={() => setFlair(flairElm.flair_text)}/>
+                                    )
+                                )}
+                            </Tab.Panel> : null }
                             <Tab.Panel>
                                 <span>Width : </span><input type="number" name="width" id="width" value={width} onChange={handleWidth} min="1" max="100" className="w-12"/>
                             </Tab.Panel>

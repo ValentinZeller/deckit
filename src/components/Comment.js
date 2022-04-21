@@ -1,21 +1,13 @@
 import './Comment.scss';
 import { useState, useEffect } from 'react'
-import PostDetail from "./PostDetail";
+import PostDetail from "./Detail";
 import Content from "./Content";
 import { fetchComment } from "../API/fetch";
+import { randomColor } from "../utils/color";
 
 function Comment(props) {
     let [nestedComments] = useState(props.nestedComments);
     let [replies, setReplies] = useState();
-
-    const randomColor = () => {
-        let letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
 
     useEffect(() => {
         let isMounted = true;

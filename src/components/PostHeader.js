@@ -1,5 +1,5 @@
 import './PostHeader.scss';
-import PostDetail from './PostDetail';
+import PostDetail from './Detail';
 
 function PostHeader(props) {
 

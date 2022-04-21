@@ -100,6 +100,7 @@ function App() {
     });
   }
 
+
   return (
     <div className="App h-screen overflow-y-hidden flex bg-white dark:bg-gray-800 dark:text-slate-300">
       <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} columnWidth={columnWidth} widthFunction={setColumnWidth} >

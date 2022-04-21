@@ -61,6 +61,18 @@ if (token) {
     clientSecret: clientSecret,
     refreshToken: refreshToken
   });
+  //r.getSubreddit("France").getLinkFlairTemplates().then(console.log);
+}
+
+
+export async function fetchSubredditFlair(subreddit) {
+  if (r) {
+    return await r.getSubreddit(subreddit).getLinkFlairTemplates();
+  }
+}
+
+export async function fetchSubredditByFlair(subreddit, sorting, after, time, flair) {
+  return await r.search({ query: `flair:${flair}` ,subreddit: subreddit, sort: sorting, after: after });
 }
 
 export async function fetchSubredditAPI(subreddit, sorting, after, time) {
