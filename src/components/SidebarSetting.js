@@ -72,6 +72,10 @@ function SidebarSetting(props) {
                                 <input type="range" className='ml-2 mr-2' min="0" max="100" onChange={(onWidthChange)} value={props.columnWidth}/>
                                 <output>{props.columnWidth}</output>
                             </div>
+                            <div className='subscription mt-2'>
+                                <label>Use subreddits subscribed :</label>
+                                <input type="checkbox" className='ml-2 mr-2' onChange={(e) => props.subscriptionFunction(e.target.checked)} checked={props.subscription ? 1 : 0}/>
+                            </div>
                         </div>
                     </div>
                 </div>

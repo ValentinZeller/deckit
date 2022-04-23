@@ -4,7 +4,7 @@ const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 const clientId = process.env.REACT_APP_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_CLIENT_SECRET;
 const redirectUrl = process.env.REACT_APP_REDIRECT_URL;
-let scope = ['identity', 'read', 'history', 'vote', 'save', 'flair', 'privatemessages', 'subscribe' ];
+let scope = ['identity', 'read', 'history', 'vote', 'save', 'flair', 'privatemessages', 'subscribe', 'mysubreddits' ];
 let state = 'fe211bebc52eb3da9bef8db6e63104d3';
 
 const token = localStorage.getItem('token');
@@ -61,9 +61,7 @@ if (token) {
     clientSecret: clientSecret,
     refreshToken: refreshToken
   });
-  //r.getSubreddit("France").getLinkFlairTemplates().then(console.log);
 }
-
 
 export async function fetchSubredditFlair(subreddit) {
   if (r) {

@@ -34,9 +34,9 @@ const Subreddit = forwardRef((props, ref) => {
             let data;
             if (r && r.ratelimitRemaining > 0 && r.ratelimitRemaining !== null) {
                 if (flair !== undefined) {
-                    data = await fetchSubreddit(props.name, sorting, after, time);
-                } else {
                     data = await fetchSubredditByFlair(props.name, sorting, after, time, flair);
+                } else {
+                    data = await fetchSubredditAPI(props.name, sorting, after, time);
                 }
                 afterTemp.current = data._query.after;
                 if (posts.length === 0 || after === undefined) {
@@ -56,11 +56,10 @@ const Subreddit = forwardRef((props, ref) => {
                 }
             }
             
-            if (flairList.length === 0) {
+            if (flairList) {
                 let tempFlair = await fetchSubredditFlair(props.name);
                 setFlairList(tempFlair);
             }
-
         }
         if (isMounted) {
             updateSubreddit();
@@ -159,7 +158,7 @@ const Subreddit = forwardRef((props, ref) => {
                             { r ?
                             <Tab.Panel>
                                 <SortingButton name="None" sortFunction={() => setFlair(undefined)}/>
-                                { flairList.length > 0 && flairList.map(
+                                { flairList && flairList.map(
                                     (flairElm, index) => (
                                         <SortingButton key={index} name={flairElm.flair_text} sortFunction={() => setFlair(flairElm.flair_text)}/>
                                     )

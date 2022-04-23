@@ -5,17 +5,22 @@ import Post from './components/Post';
 import { useState, useEffect, createRef, useRef } from 'react';
 import { fetchAbout } from './API/fetch.js';
 import './API/main.js'
+import { r } from './API/main.js';
 
 function App() {
-  const cacheSubs = JSON.parse(localStorage.getItem("subreddits"));
-
-  if (cacheSubs) {
-    cacheSubs.map(subreddit => {
-      return subreddit
-    })
+  const cacheSubreddit = () => {
+    const cacheSubs = JSON.parse(localStorage.getItem("subreddits"));
+    if (cacheSubs) {
+      cacheSubs.map(subreddit => {
+        return subreddit;
+      })
+    }
+    return cacheSubs;
   }
 
-  const [subreddits, setSubreddits] = useState(cacheSubs);
+  let [useSubscription, setUseSubscription] = useState(localStorage.getItem('useSubscription'));
+  const [subreddits, setSubreddits] = useState();
+
   const [selectedSubreddit, setSelectedSubreddit] = useState();
   let [columnWidth, setColumnWidth] = useState(localStorage.getItem("columnWidth"));
 
@@ -25,7 +30,8 @@ function App() {
   let [icons, setIcons] = useState([]);
 
   useEffect(() => {
-    let isMounted = true; 
+    let isMounted = true;
+    
     async function updateIcon(url) {
       const data = await fetchAbout(url);
       let src = "";
@@ -39,10 +45,9 @@ function App() {
       icons[url] = src;
       setIcons({...icons});
     }
-    
-    localStorage.setItem("subreddits", JSON.stringify(subreddits));
+
     if (isMounted) {
-      if (subreddits !== null) {
+      if (subreddits !== null && subreddits !== undefined && subreddits.length > 0) {
         subreddits.forEach(subreddit => {
           updateIcon(subreddit);
         })
@@ -52,6 +57,26 @@ function App() {
     return () => { isMounted = false }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subreddits]);
+
+  useEffect(() => {
+    async function fetchSubscriptions() {
+      let data = await r.getSubscriptions({limit: 50});
+      let json = data.toJSON();
+      let array = [];
+      json.forEach(sub => {
+        if (sub.subreddit_type === 'public') {
+          array.push(sub.display_name);
+         }
+      })
+      setSubreddits(array);
+    }
+    localStorage.setItem("useSubscription", useSubscription);
+    if (r && useSubscription) {
+      fetchSubscriptions();
+    } else {
+      setSubreddits(cacheSubreddit());
+    }
+  }, [useSubscription]);
 
   useEffect(() => {
     localStorage.setItem("columnWidth", columnWidth);
@@ -100,10 +125,22 @@ function App() {
     });
   }
 
+  const handleTags = (tags) => {
+    setSubreddits(tags);
+    //localStorage.setItem("subreddits", JSON.stringify(subreddits));
+  }
 
   return (
     <div className="App h-screen overflow-y-hidden flex bg-white dark:bg-gray-800 dark:text-slate-300">
-      <Sidebar clickFunction={add} tagFunction={setSubreddits} subreddits={subreddits} columnWidth={columnWidth} widthFunction={setColumnWidth} >
+      <Sidebar 
+        clickFunction={add} 
+        tagFunction={handleTags} 
+        subreddits={subreddits} 
+        columnWidth={columnWidth} 
+        widthFunction={setColumnWidth}
+        subscriptionFunction={setUseSubscription}
+        subscription={useSubscription}
+      >
         {(subreddits && icons) ? subreddits.map((subreddit, index) => {
           return(
             <li key={index} className='h-10' onClick={() => focusSubreddit(subreddit)}>
