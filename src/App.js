@@ -18,7 +18,7 @@ function App() {
     return cacheSubs;
   }
 
-  let [useSubscription, setUseSubscription] = useState(localStorage.getItem('useSubscription'));
+  let [useSubscription, setUseSubscription] = useState(JSON.parse(localStorage.getItem('useSubscription')));
   const [subreddits, setSubreddits] = useState();
 
   const [selectedSubreddit, setSelectedSubreddit] = useState();

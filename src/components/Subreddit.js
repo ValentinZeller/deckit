@@ -97,21 +97,19 @@ const Subreddit = forwardRef((props, ref) => {
         localStorage.setItem(`${props.name}_width`, element.value);
     }
 
-    function scrollTop(e) {
-        e.target.parentElement.parentElement.scrollTop = 0;
+    function scrollTop() {
+        ref.current.scrollTop = 0;
     }
 
     function handleTab(e) {
-        if (selectedIndex !== e.index) {
-            setSelectedIndex(e.index);
-        } else {
+        if (e.target.attributes.class.value.includes("selected-tab")) {
             setSelectedIndex(lastIndex);
         }
     }
 
     return(
-        <div id={props.name} style={{flex: `0 0 ${width}%`}} tabIndex={props.tabIndex} ref={ref} onScroll={handleScroll} className={`subreddit h-screen overflow-y-scroll ${props.hidden ? 'hidden' : ''}`}>
-            <div onClick={scrollTop} className="subreddit-header hover:cursor-pointer  lg:p-1 z-10 sticky top-0 bg-slate-900 items-center lg:gap-1">
+        <div id={props.name} onClick={scrollTop} style={{flex: `0 0 ${width}%`}} tabIndex={props.tabIndex} ref={ref} onScroll={handleScroll} className={`subreddit h-screen overflow-y-scroll ${props.hidden ? 'hidden' : ''}`}>
+            <div className="subreddit-header hover:cursor-pointer  lg:p-1 z-10 sticky top-0 dark:bg-slate-900 items-center lg:gap-1">
                 <div className='flex'>
                     {props.icon !== null ? <img src={props.icon} alt={props.name} className="h-6 w-6 lg:h-8 lg:w-8 inline-block rounded-full lg:mr-2" /> : null}
                     <span className='pr-2 pt-1'>{props.name}</span>
@@ -120,7 +118,7 @@ const Subreddit = forwardRef((props, ref) => {
                             <Tab as={Fragment}>
                             {({ selected }) => (
                                 <button onClick={handleTab} className={selected ? 'selected-tab' : ''}>
-                                    {sorting}<ChevronDownIcon className={`lg:w-6 inline ${selected ? "transform rotate-180" : ""}`}/>
+                                    {sorting}<ChevronDownIcon className={`lg:w-6 inline ${selected ? "transform rotate-180 selected-tab" : ""}`}/>
                                 </button>
                             )}
                             </Tab>
@@ -128,14 +126,14 @@ const Subreddit = forwardRef((props, ref) => {
                             <Tab as={Fragment}>
                             {({ selected }) => (
                                 <button onClick={handleTab} className={selected ? 'selected-tab' : ''}>
-                                    {flair ? flair : "flair"}<ChevronDownIcon className={`lg:w-6 inline ${selected ? "transform rotate-180" : ""}`}/>
+                                    {flair ? flair : "flair"}<ChevronDownIcon className={`lg:w-6 inline ${selected ? "transform rotate-180 selected-tab" : ""}`}/>
                                 </button>
                             )}
                             </Tab> : null }
                             <Tab as={Fragment}>
                             {({ selected }) => (
                                 <button onClick={handleTab} className={selected ? 'selected-tab' : ''}>
-                                    <MenuIcon className={`lg:w-6 inline`}/>
+                                    <MenuIcon className={`lg:w-6 inline ${selected ? 'selected-tab' : ''}`}/>
                                 </button>
                             )}
                             </Tab>
@@ -174,7 +172,7 @@ const Subreddit = forwardRef((props, ref) => {
                     {props.clickFunction ? <button onClick={props.clickFunction} className="w-8 bg-red-700 ml-auto"><XIcon /></button> : <></>}
                 </div>
             </div>
-            <div className="subreddit-body bg-slate-700 mb-4" >
+            <div className="subreddit-body dark:bg-slate-700 mb-4" >
                 {posts && posts.map(
                     (item, i) => ( 
                         <PostHeader 
