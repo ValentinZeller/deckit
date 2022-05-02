@@ -15,7 +15,7 @@ function Comment(props) {
         async function updateComment() {
             if (props.permalink !== undefined) {
                 const data = await fetchComment(props.permalink);
-                if (data[1]) {
+                if (data) {
                     if (data[1].data.children[0].data.replies) {
                         setReplies(data[1].data.children[0].data.replies.data.children.map(child => child.data));
                     }

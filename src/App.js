@@ -3,7 +3,7 @@ import Sidebar from './components/Sidebar.js';
 import Subreddit from './components/Subreddit';
 import Post from './components/Post';
 import { useState, useEffect, createRef, useRef } from 'react';
-import { fetchAbout } from './API/fetch.js';
+import { fetchAbout, abortManager } from './API/fetch.js';
 import './API/main.js'
 import { r } from './API/main.js';
 
@@ -102,11 +102,12 @@ function App() {
   }
 
   const hidePost = (name) => {
+    abortManager.abort();
     setPosts([]);
-    setSelectedSubreddit()
+    setSelectedSubreddit();
     setTimeout(() => {
       focusSubreddit(name);
-    }, 100);
+    }, 10);
   }
 
   const isSelected = (name) => {
@@ -127,7 +128,9 @@ function App() {
 
   const handleTags = (tags) => {
     setSubreddits(tags);
-    //localStorage.setItem("subreddits", JSON.stringify(subreddits));
+    if (!r) {
+      localStorage.setItem("subreddits", JSON.stringify(subreddits));
+    }
   }
 
   return (
@@ -162,7 +165,7 @@ function App() {
               clickPost={showPost}
               hidden={isSelected(item)}
               columnWidth={columnWidth}
-              icon={icons[item]} 
+              icon={icons[item]}
             />
             )
           ) : null}
@@ -176,7 +179,7 @@ function App() {
               vote={item.ups} 
               author={item.author} 
               comments={item.num_comments} 
-              date={item.created_utc} 
+              date={item.created_utc}
             /> 
               )
             ) : null}

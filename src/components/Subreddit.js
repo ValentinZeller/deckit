@@ -29,7 +29,7 @@ const Subreddit = forwardRef((props, ref) => {
     let afterTemp = useRef();
 
     useEffect(() => {
-        let isMounted = true;
+
         async function updateSubreddit() {
             let data;
             if (r && r.ratelimitRemaining > 0 && r.ratelimitRemaining !== null) {
@@ -47,7 +47,9 @@ const Subreddit = forwardRef((props, ref) => {
                 }
             } else {
                 data = await fetchSubreddit(props.name, sorting, after, time);
-                afterTemp.current = data.after;
+                if (data.after) {
+                    afterTemp.current = data.after;
+                }
                 if (posts.length === 0 || after === undefined) {
                     setPosts(data.children.map(child => child.data));
                 } else {
@@ -61,13 +63,10 @@ const Subreddit = forwardRef((props, ref) => {
                 setFlairList(tempFlair);
             }
         }
-        if (isMounted) {
-            updateSubreddit();
-        }
-
-        return () => { isMounted = false }
+        
+        updateSubreddit();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [after, props.name, sorting, time, flair]);
+    }, [after, props.name, sorting, time, flair ]);
 
     function handleSorting(sort) {
         if (sort !== sorting) {
@@ -102,14 +101,14 @@ const Subreddit = forwardRef((props, ref) => {
     }
 
     function handleTab(e) {
-        if (e.target.attributes.class.value.includes("selected-tab")) {
+        if (e.target.classList.value.includes("selected-tab")) {
             setSelectedIndex(lastIndex);
         }
     }
 
     return(
-        <div id={props.name} onClick={scrollTop} style={{flex: `0 0 ${width}%`}} tabIndex={props.tabIndex} ref={ref} onScroll={handleScroll} className={`subreddit h-screen overflow-y-scroll ${props.hidden ? 'hidden' : ''}`}>
-            <div className="subreddit-header hover:cursor-pointer  lg:p-1 z-10 sticky top-0 dark:bg-slate-900 items-center lg:gap-1">
+        <div id={props.name} style={{flex: `0 0 ${width}%`}} tabIndex={props.tabIndex} ref={ref} onScroll={handleScroll} className={`subreddit h-screen overflow-y-scroll ${props.hidden ? 'hidden' : ''}`}>
+            <div onClick={scrollTop} className="subreddit-header hover:cursor-pointer  lg:p-1 z-10 sticky top-0 dark:bg-slate-900 items-center lg:gap-1">
                 <div className='flex'>
                     {props.icon !== null ? <img src={props.icon} alt={props.name} className="h-6 w-6 lg:h-8 lg:w-8 inline-block rounded-full lg:mr-2" /> : null}
                     <span className='pr-2 pt-1'>{props.name}</span>

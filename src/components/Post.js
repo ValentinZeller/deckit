@@ -11,20 +11,18 @@ const Post = (props => {
     let [sorting, setSorting] = useState('confidence');
     
     useEffect(() => {
-        let isMounted = true;
         setComments([]);
         setPost([]);
 
         async function updatePost() {
             const data = await fetchPost(props.permalink, sorting);
-            setPost(data[0].data.children[0].data);
-            setComments(data[1].data.children.map(child => child.data));
+            if (data) {
+                setPost(data[0].data.children[0].data);
+                setComments(data[1].data.children.map(child => child.data));
+            }
         }
-        
-        if (isMounted) {
-            updatePost();
-        }
-        return () => { isMounted = false }
+
+        updatePost();
     }, [props.permalink, sorting]);
 
     return(
