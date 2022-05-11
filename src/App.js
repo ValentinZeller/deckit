@@ -180,6 +180,7 @@ function App() {
               author={item.author} 
               comments={item.num_comments} 
               date={item.created_utc}
+              likes={item.likes}
             /> 
               )
             ) : null}

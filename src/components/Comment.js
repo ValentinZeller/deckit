@@ -33,7 +33,13 @@ function Comment(props) {
     return(
         <div className={`comment ${nestedComments ? 'nested' : 'notnested' }`} style={{borderLeft: `1px solid ${randomColor()}`}}>
             <div className="comment-item mt-1 pb-1">
-                <PostDetail vote={props.ups} author={props.author} date={props.date} />
+                <PostDetail 
+                    vote={props.ups} 
+                    author={props.author} 
+                    date={props.date} 
+                    id={props.id}
+                    likes={props.likes}
+                />
                 <div className="comment-item-body mt-2 pl-2">
                     <Content content={props.body}/>
                     {(replies) ? replies.map(
@@ -44,7 +50,8 @@ function Comment(props) {
                                 permalink={child.permalink}
                                 ups={child.ups} 
                                 author={child.author} 
-                                date={child.created_utc} 
+                                date={child.created_utc}
+                                likes={props.likes} 
                                 body={child}
                                 nestedComments={!nestedComments} />
                         )) : null}

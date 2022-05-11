@@ -4,37 +4,51 @@ import Content from "./Content";
 import SortingButton from "./SortingButton";
 import { useState, useEffect } from 'react'
 import { fetchPost } from "../API/fetch";
+import { RefreshIcon } from "@heroicons/react/solid";
 
 const Post = (props => {
     let [post, setPost] = useState();
     let [comments, setComments] = useState();
     let [sorting, setSorting] = useState('confidence');
+
+    async function updatePost() {
+        const data = await fetchPost(props.permalink, sorting);
+        if (data) {
+            setPost(data[0].data.children[0].data);
+            setComments(data[1].data.children.map(child => child.data));
+        }
+    }
     
     useEffect(() => {
         setComments([]);
         setPost([]);
 
-        async function updatePost() {
-            const data = await fetchPost(props.permalink, sorting);
-            if (data) {
-                setPost(data[0].data.children[0].data);
-                setComments(data[1].data.children.map(child => child.data));
-            }
-        }
-
         updatePost();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.permalink, sorting]);
+
+    function refreshPost() {
+        setComments([]);
+        setPost([]);
+        updatePost();
+    }
 
     return(
         <div className="post overflow-y-scroll overflow-x-hidden basis-3/4">
             <div className="post-header sticky top-0 bg-slate-900 p-2">
+                <button className="w-6 align-text-top" onClick={refreshPost}><RefreshIcon/></button>
                 <span className="post-title"><a target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-300" href={`https://www.reddit.com${props.permalink}`}>Link</a> : {props.title}</span>
             </div>
             <div className="post-content top-10">
                 <div className={`post-body ${props.crosspost ? 'bg-slate-600' : 'bg-slate-700'} p-3`} >
                     <Content content={post}/>
                 </div>
-                <PostDetail vote={props.vote} author={props.author} comments={props.comments} date={props.date} />                
+                <PostDetail 
+                    vote={props.vote} 
+                    author={props.author} 
+                    comments={props.comments} 
+                    date={props.date}
+                />                
                 { !props.crosspost ?
                     <div className="post-sorting bg-slate-800 p-2">
                         <span>Sort by : </span>
@@ -57,6 +71,7 @@ const Post = (props => {
                             author={comment.author} 
                             date={comment.created_utc} 
                             body={comment}
+                            likes={comment.likes}   
                             nestedComments={false} />)
                         ) : null}
                 </div>

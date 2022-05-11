@@ -24,7 +24,14 @@ function PostHeader(props) {
                 </div>
                 <span className="subreddit-post-title align-top">{props.title}</span>
             </div>
-            <PostDetail vote={props.vote} author={props.author} comments={props.comments} date={props.date} />
+            <PostDetail 
+                vote={props.vote} 
+                author={props.author} 
+                comments={props.comments} 
+                date={props.date}
+                id={props.id}
+                likes={props.likes}    
+            />
         </div>
     );
 }

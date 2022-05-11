@@ -9,7 +9,6 @@ function Content(props) {
     let content;
 
     let data = props.content;
-
     if (data) {
         if (data.is_self) {
             // Text Post

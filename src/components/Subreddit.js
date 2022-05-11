@@ -2,7 +2,7 @@ import './Subreddit.scss';
 import SortingButton from './SortingButton';
 import { useState, useEffect, useRef, forwardRef, Fragment } from 'react'
 import PostHeader from './PostHeader';
-import { XIcon, ArrowSmLeftIcon, ChevronDownIcon, MenuIcon } from '@heroicons/react/solid';
+import { XIcon, ArrowSmLeftIcon, ChevronDownIcon, MenuIcon, RefreshIcon } from '@heroicons/react/solid';
 import MyPopover from './MyPopover';
 import { fetchSubreddit } from '../API/fetch';
 import { r, fetchSubredditAPI, fetchSubredditByFlair, fetchSubredditFlair } from '../API/main';
@@ -28,42 +28,42 @@ const Subreddit = forwardRef((props, ref) => {
     let [flairList, setFlairList] = useState([]);
     let afterTemp = useRef();
 
-    useEffect(() => {
-
-        async function updateSubreddit() {
-            let data;
-            if (r && r.ratelimitRemaining > 0 && r.ratelimitRemaining !== null) {
-                if (flair !== undefined) {
-                    data = await fetchSubredditByFlair(props.name, sorting, after, time, flair);
-                } else {
-                    data = await fetchSubredditAPI(props.name, sorting, after, time);
-                }
-                afterTemp.current = data._query.after;
-                if (posts.length === 0 || after === undefined) {
-                    setPosts(data.toJSON());
-                } else {
-                    let arrMerge = [...posts, ...data.toJSON()];
-                    setPosts(arrMerge);
-                }
+    
+    async function updateSubreddit() {
+        let data;
+        if (r && r.ratelimitRemaining > 0 && r.ratelimitRemaining !== null) {
+            if (flair !== undefined) {
+                data = await fetchSubredditByFlair(props.name, sorting, after, time, flair);
             } else {
-                data = await fetchSubreddit(props.name, sorting, after, time);
-                if (data.after) {
-                    afterTemp.current = data.after;
-                }
-                if (posts.length === 0 || after === undefined) {
-                    setPosts(data.children.map(child => child.data));
-                } else {
-                    let arrMerge = posts.concat(data.children.map(child => child.data));
-                    setPosts(arrMerge);
-                }
+                data = await fetchSubredditAPI(props.name, sorting, after, time);
             }
-            
+            afterTemp.current = data._query.after;
+            if (posts.length === 0 || after === undefined) {
+                setPosts(data.toJSON());
+            } else {
+                let arrMerge = [...posts, ...data.toJSON()];
+                setPosts(arrMerge);
+            }
             if (flairList) {
                 let tempFlair = await fetchSubredditFlair(props.name);
                 setFlairList(tempFlair);
             }
+        } else {
+            data = await fetchSubreddit(props.name, sorting, after, time);
+            if (data.after) {
+                afterTemp.current = data.after;
+            }
+            if (posts.length === 0 || after === undefined) {
+                setPosts(data.children.map(child => child.data));
+            } else {
+                let arrMerge = posts.concat(data.children.map(child => child.data));
+                setPosts(arrMerge);
+            }
         }
-        
+    }
+    
+    useEffect(() => {
+
         updateSubreddit();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [after, props.name, sorting, time, flair ]);
@@ -104,6 +104,12 @@ const Subreddit = forwardRef((props, ref) => {
         if (e.target.classList.value.includes("selected-tab")) {
             setSelectedIndex(lastIndex);
         }
+    }
+
+    function refreshSub() {
+        setPosts([]);
+        setAfter(undefined);
+        updateSubreddit();
     }
 
     return(
@@ -162,7 +168,14 @@ const Subreddit = forwardRef((props, ref) => {
                                 )}
                             </Tab.Panel> : null }
                             <Tab.Panel>
-                                <span>Width : </span><input type="number" name="width" id="width" value={width} onChange={handleWidth} min="1" max="100" className="w-12"/>
+                                <div className="flex flex-col">
+                                    <div>
+                                        <span>Refresh : </span><button className="w-6 align-text-top" onClick={refreshSub}><RefreshIcon/></button>
+                                    </div>
+                                    <div>
+                                        <span>Width : </span><input type="number" name="width" id="width" value={width} onChange={handleWidth} min="1" max="100" className="w-12"/>
+                                    </div>
+                                </div>
                             </Tab.Panel>
                             <Tab.Panel></Tab.Panel>
                         </Tab.Panels>
@@ -175,13 +188,15 @@ const Subreddit = forwardRef((props, ref) => {
                 {posts && posts.map(
                     (item, i) => ( 
                         <PostHeader 
-                            key={i} 
+                            key={i}
+                            id={item.id} 
                             thumbnail={item.thumbnail} 
                             title={item.title} 
                             vote={item.ups} 
                             author={item.author} 
                             comments={item.num_comments} 
-                            date={item.created_utc} 
+                            date={item.created_utc}
+                            likes={item.likes}    
                             clickPost={() => props.clickPost(item, props.name)}  
                         />
                     ) 
