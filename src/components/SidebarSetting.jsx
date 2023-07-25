@@ -3,7 +3,8 @@ import { Dialog } from '@headlessui/react'
 import DragSort from '@yaireo/dragsort'
 import '@yaireo/dragsort/dist/dragsort.css'
 import '@yaireo/tagify/dist/tagify.css'
-import { XIcon } from '@heroicons/react/solid';
+import React from 'react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 
 //import Tags from './tagify/react.tagify'
@@ -18,7 +19,7 @@ function SidebarSetting(props) {
     // This is done inside a `useMemo` hook to make sure it gets initialized
     // only when the ref updates with a value ("current")
     useEffect(() => {
-        if(tagifyRefDragSort.current)
+        if (tagifyRefDragSort.current)
             new DragSort(tagifyRefDragSort.current.DOM.scope, {
                 selector: '.tagify__tag',
                 callbacks: {
@@ -27,7 +28,7 @@ function SidebarSetting(props) {
             })
     }, [isOpen])
 
-    function onDragEnd(elm){
+    function onDragEnd(elm) {
         tagifyRefDragSort.current.updateValueByDOMTags()
     }
 
@@ -45,18 +46,18 @@ function SidebarSetting(props) {
         navigator.clipboard.writeText(tagifyRefDragSort.current.value.map(item => item.value).join(','));
     }
 
-    return(
+    return (
         <li className='h-12'>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed z-10 inset-0 overflow-y-auto">
                 <div className="items-center justify-center p-5">
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
                     <div className="relative bg-slate-700 text-white rounded max-w-5xl mx-auto p-4">
-                        <Dialog.Title 
+                        <Dialog.Title
                             as='h2'
                             className="text-4xl font-medium leading-6"
                         >
                             Setting
-                            <button className="absolute top-2 right-2 m-2 w-8 bg-red-700" onClick={() => setIsOpen(false)}><XIcon /></button>
+                            <button className="absolute top-2 right-2 m-2 w-8 bg-red-700" onClick={() => setIsOpen(false)}><XMarkIcon /></button>
                         </Dialog.Title>
                         <div className='mt-5'>
                             <Tags
@@ -69,12 +70,8 @@ function SidebarSetting(props) {
                             <button className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => copyList()}>Copy the list</button>
                             <div className='widthField mt-2'>
                                 <label>Column Width :</label>
-                                <input type="range" className='ml-2 mr-2' min="0" max="100" onChange={(onWidthChange)} value={props.columnWidth}/>
+                                <input type="range" className='ml-2 mr-2' min="0" max="100" onChange={(onWidthChange)} value={props.columnWidth} />
                                 <output>{props.columnWidth}</output>
-                            </div>
-                            <div className='subscription mt-2'>
-                                <label>Use subreddits subscribed :</label>
-                                <input type="checkbox" className='ml-2 mr-2' onChange={(e) => props.subscriptionFunction(e.target.checked)} checked={props.subscription ? 1 : 0}/>
                             </div>
                         </div>
                     </div>

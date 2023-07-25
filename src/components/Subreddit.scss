@@ -16,9 +16,11 @@
         border-radius: 10px;
     }
 
-    button {
-        flex-basis: auto;
-        display: inline-flex
+    .tabpanels {
+        
+        button {
+            flex-basis: auto;
+            display: inline-flex
+        }
     }
-
 }

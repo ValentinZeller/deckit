@@ -1,13 +1,14 @@
-.subreddit-post-image, .subreddit-post-image img {
+.subreddit-post-image,
+.subreddit-post-image img {
     min-width: 70px;
     max-width: 70px;
     height: 70px;
 }
 
 .thumbnail-placeholder {
-    background: url(../../public/thumb_sprite.png) 0 0;
-    width:70px;
-    height:51px;
+    background: url(../../thumb_sprite.png) 0 0;
+    width: 70px;
+    height: 51px;
     float: left;
     margin-right: 6px;
 }

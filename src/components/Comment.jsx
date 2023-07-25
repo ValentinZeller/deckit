@@ -2,6 +2,7 @@ import './Comment.scss';
 import { useState, useEffect } from 'react'
 import PostDetail from "./Detail";
 import Content from "./Content";
+import React from 'react';
 import { fetchComment } from "../API/fetch";
 import { randomColor } from "../utils/color";
 
@@ -11,7 +12,7 @@ function Comment(props) {
 
     useEffect(() => {
         let isMounted = true;
-        
+
         async function updateComment() {
             if (props.permalink !== undefined) {
                 const data = await fetchComment(props.permalink);
@@ -26,32 +27,32 @@ function Comment(props) {
             setReplies();
             updateComment();
         }
-        
+
         return () => { isMounted = false }
     }, [props.permalink]);
 
-    return(
-        <div className={`comment ${nestedComments ? 'nested' : 'notnested' }`} style={{borderLeft: `1px solid ${randomColor()}`}}>
+    return (
+        <div className={`comment ${nestedComments ? 'nested' : 'notnested'}`} style={{ borderLeft: `1px solid ${randomColor()}` }}>
             <div className="comment-item mt-1 pb-1">
-                <PostDetail 
-                    vote={props.ups} 
-                    author={props.author} 
-                    date={props.date} 
+                <PostDetail
+                    vote={props.ups}
+                    author={props.author}
+                    date={props.date}
                     id={props.id}
                     likes={props.likes}
                 />
                 <div className="comment-item-body mt-2 pl-2">
-                    <Content content={props.body}/>
+                    <Content content={props.body} />
                     {(replies) ? replies.map(
                         (child, index) => (
-                            <Comment 
+                            <Comment
                                 key={index}
-                                id={child.id} 
+                                id={child.id}
                                 permalink={child.permalink}
-                                ups={child.ups} 
-                                author={child.author} 
+                                ups={child.ups}
+                                author={child.author}
                                 date={child.created_utc}
-                                likes={props.likes} 
+                                likes={props.likes}
                                 body={child}
                                 nestedComments={!nestedComments} />
                         )) : null}

@@ -4,10 +4,16 @@ a {
 
 .post-image {
     width: 50%;
+    min-width: 360px;
 }
 
 .gallery-image {
     max-height: 340px;
+}
+
+.post-comments img {
+    width: 33%;
+    min-width: 64px;
 }
 
 figure {

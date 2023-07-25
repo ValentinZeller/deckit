@@ -1,11 +1,10 @@
 import './App.scss';
-import Sidebar from './components/Sidebar.js';
+import Sidebar from './components/Sidebar';
 import Subreddit from './components/Subreddit';
 import Post from './components/Post';
+import React from 'react';
 import { useState, useEffect, createRef, useRef } from 'react';
 import { fetchAbout, abortManager } from './API/fetch.js';
-import './API/main.js'
-import { r } from './API/main.js';
 
 function App() {
   const cacheSubreddit = () => {
@@ -18,11 +17,14 @@ function App() {
     return cacheSubs;
   }
 
-  let [useSubscription, setUseSubscription] = useState(JSON.parse(localStorage.getItem('useSubscription')));
-  const [subreddits, setSubreddits] = useState();
+  const [subreddits, setSubreddits] = useState(cacheSubreddit);
 
   const [selectedSubreddit, setSelectedSubreddit] = useState();
-  let [columnWidth, setColumnWidth] = useState(localStorage.getItem("columnWidth"));
+  let cacheWidth = 25;
+  if (localStorage.getItem("columnWidth")) {
+    cacheWidth = localStorage.getItem("columnWidth");
+  }
+  let [columnWidth, setColumnWidth] = useState(cacheWidth);
 
   const [posts, setPosts] = useState([]);
   const subsRef = useRef([]);
@@ -31,11 +33,11 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     async function updateIcon(url) {
       const data = await fetchAbout(url);
       let src = "";
-      if (data.icon_img !== ''){
+      if (data.icon_img !== '') {
         src = data.icon_img;
       } else if (data.community_icon !== '') {
         src = data.community_icon.split('?')[0];
@@ -43,7 +45,7 @@ function App() {
         src = process.env.PUBLIC_URL + "/favicon.png";
       }
       icons[url] = src;
-      setIcons({...icons});
+      setIcons({ ...icons });
     }
 
     if (isMounted) {
@@ -55,28 +57,8 @@ function App() {
     }
 
     return () => { isMounted = false }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subreddits]);
-
-  useEffect(() => {
-    async function fetchSubscriptions() {
-      let data = await r.getSubscriptions({limit: 50});
-      let json = data.toJSON();
-      let array = [];
-      json.forEach(sub => {
-        if (sub.subreddit_type === 'public') {
-          array.push(sub.display_name);
-         }
-      })
-      setSubreddits(array);
-    }
-    localStorage.setItem("useSubscription", useSubscription);
-    if (r && useSubscription) {
-      fetchSubscriptions();
-    } else {
-      setSubreddits(cacheSubreddit());
-    }
-  }, [useSubscription]);
 
   useEffect(() => {
     localStorage.setItem("columnWidth", columnWidth);
@@ -89,12 +71,6 @@ function App() {
       setSubreddits([name, ...subreddits]);
     }
   }
-
-  /*
-  const remove = (name) => {
-    setSubreddits(subreddits.filter(subreddit => subreddit !== name));
-  }
-  */
 
   const showPost = (item, name) => {
     setPosts([item]);
@@ -128,62 +104,58 @@ function App() {
 
   const handleTags = (tags) => {
     setSubreddits(tags);
-    if (!r) {
-      localStorage.setItem("subreddits", JSON.stringify(subreddits));
-    }
+    localStorage.setItem("subreddits", JSON.stringify(tags));
   }
 
   return (
     <div className="App h-screen overflow-y-hidden flex bg-white dark:bg-gray-800 dark:text-slate-300">
-      <Sidebar 
-        clickFunction={add} 
-        tagFunction={handleTags} 
-        subreddits={subreddits} 
-        columnWidth={columnWidth} 
+      <Sidebar
+        clickFunction={add}
+        tagFunction={handleTags}
+        subreddits={subreddits}
+        columnWidth={columnWidth}
         widthFunction={setColumnWidth}
-        subscriptionFunction={setUseSubscription}
-        subscription={useSubscription}
       >
         {(subreddits && icons) ? subreddits.map((subreddit, index) => {
-          return(
+          return (
             <li key={index} className='h-10' onClick={() => focusSubreddit(subreddit)}>
-              <img src={icons[subreddit]} alt={subreddit} className="w-12 hover:cursor-pointer"/>
+              <img src={icons[subreddit]} alt={subreddit} className="w-12 hover:cursor-pointer" />
             </li>
-          )}
+          )
+        }
         ) : null}
       </Sidebar>
       <div className="subs flex gap-0 overflow-x-auto overflow-y-hidden" ref={mainRef}>
         {subreddits ? subreddits.map(
-          (item, i) => ( 
-            <Subreddit 
+          (item, i) => (
+            <Subreddit
               key={i}
               ref={subsRef.current[i] ? subsRef.current[i] : subsRef.current[i] = createRef()}
               tabIndex={i}
               name={item}
-              //clickFunction={!posts[0] ? () => remove(item) : null}
-              hideFunction={posts[0] ? () => hidePost(item) : null}  
+              hideFunction={posts[0] ? () => hidePost(item) : null}
               clickPost={showPost}
               hidden={isSelected(item)}
               columnWidth={columnWidth}
               icon={icons[item]}
             />
-            )
-          ) : null}
+          )
+        ) : null}
         {posts ? posts.map(
-          (item,i) => ( 
-            <Post 
-              key={i} 
-              title={item.title} 
-              url={item.url} 
-              permalink={item.permalink} 
-              vote={item.ups} 
-              author={item.author} 
-              comments={item.num_comments} 
+          (item, i) => (
+            <Post
+              key={i}
+              title={item.title}
+              url={item.url}
+              permalink={item.permalink}
+              vote={item.ups}
+              author={item.author}
+              comments={item.num_comments}
               date={item.created_utc}
               likes={item.likes}
-            /> 
-              )
-            ) : null}
+            />
+          )
+        ) : null}
       </div>
     </div>
 
