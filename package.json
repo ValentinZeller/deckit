@@ -15,7 +15,7 @@
     "@yaireo/tagify": "^4.9.8",
     "gh-pages": "^5.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^19.2.5",
     "react-markdown": "^8.0.0",
     "react-player": "^2.9.0",
     "react-popper": "^2.2.5",
